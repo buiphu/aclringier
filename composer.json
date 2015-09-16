@@ -5,9 +5,9 @@
     "license": "MIT",
     "authors": [
         {
-            "name": "bui ngoc phu",
+            "name": "ngocphu",
             "email": "ngocphu@ringier.com.vn"
-        }
+        },
     ],
     "require": {
         "php": ">=5.4.0",
