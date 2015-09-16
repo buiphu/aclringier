@@ -5,8 +5,20 @@
     "license": "MIT",
     "authors": [
         {
-            "name": "ngocphu",
-            "email": "ngocphu@ringier.com.vn"
+            "name": "Zizaco Zizuini",
+            "email": "zizaco@gmail.com"
+        },
+        {
+            "name": "Andrew Elkins",
+            "homepage": "http://andrewelkins.com"
+        },
+        {
+            "name": "Ben Batschelet",
+            "homepage": "http://github.com/bbatsche"
+        },
+        {
+            "name": "Michele Angioni",
+            "email": "michele.angioni@gmail.com"
         }
     ],
     "require": {
