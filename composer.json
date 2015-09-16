@@ -1,24 +1,12 @@
 {
-    "name": "zizaco/entrust",
+    "name": "ngocphu/aclringier",
     "description": "This package provides a flexible way to add Role-based Permissions to Laravel",
     "keywords": ["laravel","illuminate","auth","roles","acl","permission"],
     "license": "MIT",
     "authors": [
         {
-            "name": "Zizaco Zizuini",
-            "email": "zizaco@gmail.com"
-        },
-        {
-            "name": "Andrew Elkins",
-            "homepage": "http://andrewelkins.com"
-        },
-        {
-            "name": "Ben Batschelet",
-            "homepage": "http://github.com/bbatsche"
-        },
-        {
-            "name": "Michele Angioni",
-            "email": "michele.angioni@gmail.com"
+            "name": "ngocphu",
+            "email": "ngocphu@ringier.com.vn"
         }
     ],
     "require": {
@@ -37,7 +25,7 @@
             "src/commands"
         ],
         "psr-4": {
-            "Zizaco\\Entrust\\": "src/Entrust/"
+            "Ngocphu\\Ringieracl\\": "src/Entrust/"
         }
     },
     "minimum-stability": "dev"
