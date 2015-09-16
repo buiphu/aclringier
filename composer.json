@@ -25,7 +25,7 @@
             "src/commands"
         ],
         "psr-4": {
-            "Ngocphu\\Ringieracl\\": "src/Entrust/"
+            "Buiphu\\Ringieracl\\": "src/Entrust/"
         }
     },
     "minimum-stability": "dev"
