@@ -23,7 +23,7 @@
             "src/commands"
         ],
         "psr-4": {
-            "Zizaco\\Entrust\\": "src/Entrust/"
+            "Buiphu\\Aclringier\\": "src/Entrust/"
         }
     },
     "minimum-stability": "dev"
