@@ -7,8 +7,7 @@
         {
             "name": "bui ngoc phu",
             "email": "ngocphu@ringier.com.vn"
-        },
-    
+        }
     ],
     "require": {
         "php": ">=5.4.0",
