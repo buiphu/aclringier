@@ -16,7 +16,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Buiphu\\Ringieracl\\": "src/Entrust/"
+           "Zizaco\\Entrust\\": "src/Entrust/"
         }
     },
     "minimum-stability": "dev"
