@@ -1,11 +1,11 @@
 {
-    "name": "ngocphu/aclringier",
+    "name": "buiphu/aclringier",
     "description": "This package provides a flexible way to add Role-based Permissions to Laravel",
     "keywords": ["laravel","illuminate","auth","roles","acl","permission"],
     "license": "MIT",
     "authors": [
         {
-            "name": "ngocphu",
+            "name": "buiphu",
             "email": "ngocphu@ringier.com.vn"
         }
     ],
@@ -16,7 +16,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Ngocphu\\Ringieracl\\": "src/Entrust/"
+            "Buiphu\\Ringieracl\\": "src/Entrust/"
         }
     },
     "minimum-stability": "dev"
