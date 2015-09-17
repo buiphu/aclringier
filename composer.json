@@ -16,8 +16,8 @@
     },
     "autoload": {
         "psr-4": {
-           "Zizaco\\Entrust\\": "src/Entrust/"
+           "Entrust\\Contracts\\": "src"
         }
-    },
-    "minimum-stability": "dev"
+    }
+    
 }
