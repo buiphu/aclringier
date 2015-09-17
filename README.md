@@ -5,46 +5,58 @@ ACL Ringier
 
 Installation
 
-In order to install Laravel 5 Entrust, just add
+In order to install Laravel 5 Entrust, just add 
 
-"buiphu/aclringier": "dev-master"
-to your composer.json. Then run composer install or composer update.
+    "buiphu/aclringier": "dev-master"
 
-Then in your config/app.php add
+to your composer.json. Then run `composer install` or `composer update`.
 
+Then in your `config/app.php` add 
+```php
     'Zizaco\Entrust\EntrustServiceProvider'
-in the providers array and
-
+```    
+in the `providers` array and
+```php
     'Entrust' => 'Zizaco\Entrust\EntrustFacade'
-to the aliases array.
+```
+to the `aliases` array.
 
-Configuration
+## Configuration
 
-Set the property values in the config/auth.php. These values will be used by entrust to refer to the correct user table and model.
+Set the property values in the `config/auth.php`.
+These values will be used by entrust to refer to the correct user table and model.
 
-You can also publish the configuration for this package to further customize table names and model namespaces.
-Just use php artisan vendor:publish and a entrust.php file will be created in your app/config directory.
+You can also publish the configuration for this package to further customize table names and model namespaces.  
+Just use `php artisan vendor:publish` and a `entrust.php` file will be created in your app/config directory.
 
-User relation to roles
+### User relation to roles
 
 Now generate the Entrust migration:
 
+```bash
 php artisan entrust:migration
-It will generate the <timestamp>_entrust_setup_tables.php migration. You may now run it with the artisan migrate command:
+```
 
+It will generate the `<timestamp>_entrust_setup_tables.php` migration.
+You may now run it with the artisan migrate command:
+
+```bash
 php artisan migrate
+```
+
 After the migration, four new tables will be present:
+- `roles` &mdash; stores role records
+- `permissions` &mdash; stores permission records
+- `role_user` &mdash; stores [many-to-many](http://laravel.com/docs/4.2/eloquent#many-to-many) relations between roles and users
+- `permission_role` &mdash; stores [many-to-many](http://laravel.com/docs/4.2/eloquent#many-to-many) relations between roles and permissions
 
-roles — stores role records
-permissions — stores permission records
-role_user — stores many-to-many relations between roles and users
-permission_role — stores many-to-many relations between roles and permissions
-Models
+### Models
 
-Role
+#### Role
 
-Create a Role model inside app/models/Role.php using the following example:
+Create a Role model inside `app/models/Role.php` using the following example:
 
+```php
 <?php namespace App;
 
 use Zizaco\Entrust\EntrustRole;
@@ -52,17 +64,20 @@ use Zizaco\Entrust\EntrustRole;
 class Role extends EntrustRole
 {
 }
-The Role model has three main attributes:
+```
 
-name — Unique name for the Role, used for looking up role information in the application layer. For example: "admin", "owner", "employee".
-display_name — Human readable name for the Role. Not necessarily unique and optional. For example: "User Administrator", "Project Owner", "Widget Co. Employee".
-description — A more detailed explanation of what the Role does. Also optional.
-Both display_name and description are optional; their fields are nullable in the database.
+The `Role` model has three main attributes:
+- `name` &mdash; Unique name for the Role, used for looking up role information in the application layer. For example: "admin", "owner", "employee".
+- `display_name` &mdash; Human readable name for the Role. Not necessarily unique and optional. For example: "User Administrator", "Project Owner", "Widget  Co. Employee".
+- `description` &mdash; A more detailed explanation of what the Role does. Also optional.
 
-Permission
+Both `display_name` and `description` are optional; their fields are nullable in the database.
 
-Create a Permission model inside app/models/Permission.php using the following example:
+#### Permission
 
+Create a Permission model inside `app/models/Permission.php` using the following example:
+
+```php
 <?php namespace App;
 
 use Zizaco\Entrust\EntrustPermission;
@@ -70,17 +85,20 @@ use Zizaco\Entrust\EntrustPermission;
 class Permission extends EntrustPermission
 {
 }
-The Permission model has the same three attributes as the Role:
+```
 
-name — Unique name for the permission, used for looking up permission information in the application layer. For example: "create-post", "edit-user", "post-payment", "mailing-list-subscribe".
-display_name — Human readable name for the permission. Not necessarily unique and optional. For example "Create Posts", "Edit Users", "Post Payments", "Subscribe to mailing list".
-description — A more detailed explanation of the Permission.
-In general, it may be helpful to think of the last two attributes in the form of a sentence: "The permission display_name allows a user to description."
+The `Permission` model has the same three attributes as the `Role`:
+- `name` &mdash; Unique name for the permission, used for looking up permission information in the application layer. For example: "create-post", "edit-user", "post-payment", "mailing-list-subscribe".
+- `display_name` &mdash; Human readable name for the permission. Not necessarily unique and optional. For example "Create Posts", "Edit Users", "Post Payments", "Subscribe to mailing list".
+- `description` &mdash; A more detailed explanation of the Permission.
 
-User
+In general, it may be helpful to think of the last two attributes in the form of a sentence: "The permission `display_name` allows a user to `description`."
 
-Next, use the EntrustUserTrait trait in your existing User model. For example:
+#### User
 
+Next, use the `EntrustUserTrait` trait in your existing `User` model. For example:
+
+```php
 <?php
 
 use Zizaco\Entrust\Traits\EntrustUserTrait;
@@ -91,17 +109,23 @@ class User extends Eloquent
 
     ...
 }
-This will enable the relation with Role and add the following methods roles(), hasRole($name), can($permission), and ability($roles, $permissions, $options) within your User model.
+```
+
+This will enable the relation with `Role` and add the following methods `roles()`, `hasRole($name)`, `can($permission)`, and `ability($roles, $permissions, $options)` within your `User` model.
 
 Don't forget to dump composer autoload
 
+```bash
 composer dump-autoload
-And you are ready to go.
+```
 
-Soft Deleting
+**And you are ready to go.**
 
-The default migration takes advantage of onDelete('cascade') clauses within the pivot tables to remove relations when a parent record is deleted. If for some reason you cannot use cascading deletes in your database, the EntrustRole and EntrustPermission classes, and the HasRole trait include event listeners to manually delete records in relevant pivot tables. In the interest of not accidentally deleting data, the event listeners will not delete pivot data if the model uses soft deleting. However, due to limitations in Laravel's event listeners, there is no way to distinguish between a call to delete() versus a call to forceDelete(). For this reason, before you force delete a model, you must manually delete any of the relationship data (unless your pivot tables uses cascading deletes). For example:
+#### Soft Deleting
 
+The default migration takes advantage of `onDelete('cascade')` clauses within the pivot tables to remove relations when a parent record is deleted. If for some reason you cannot use cascading deletes in your database, the EntrustRole and EntrustPermission classes, and the HasRole trait include event listeners to manually delete records in relevant pivot tables. In the interest of not accidentally deleting data, the event listeners will **not** delete pivot data if the model uses soft deleting. However, due to limitations in Laravel's event listeners, there is no way to distinguish between a call to `delete()` versus a call to `forceDelete()`. For this reason, **before you force delete a model, you must manually delete any of the relationship data** (unless your pivot tables uses cascading deletes). For example:
+
+```php
 $role = Role::findOrFail(1); // Pull back a given role
 
 // Regular Delete
@@ -112,12 +136,14 @@ $role->users()->sync([]); // Delete relationship data
 $role->perms()->sync([]); // Delete relationship data
 
 $role->forceDelete(); // Now force delete will work regardless of whether the pivot table has cascading delete
-Usage
+```
 
-Concepts
+## Usage
 
-Let's start by creating the following Roles and Permissions:
+### Concepts
+Let's start by creating the following `Role`s and `Permission`s:
 
+```php
 $owner = new Role();
 $owner->name         = 'owner';
 $owner->display_name = 'Project Owner'; // optional
@@ -129,8 +155,12 @@ $admin->name         = 'admin';
 $admin->display_name = 'User Administrator'; // optional
 $admin->description  = 'User is allowed to manage and edit other users'; // optional
 $admin->save();
-Next, with both roles created let's assign them to the users. Thanks to the HasRole trait this is as easy as:
+```
 
+Next, with both roles created let's assign them to the users.
+Thanks to the `HasRole` trait this is as easy as:
+
+```php
 $user = User::where('username', '=', 'michele')->first();
 
 // role attach alias
@@ -138,8 +168,11 @@ $user->attachRole($admin); // parameter can be an Role object, array, or id
 
 // or eloquent's original technique
 $user->roles()->attach($admin->id); // id only
+```
+
 Now we just need to add permissions to those Roles:
 
+```php
 $createPost = new Permission();
 $createPost->name         = 'create-post';
 $createPost->display_name = 'Create Posts'; // optional
@@ -159,28 +192,41 @@ $admin->attachPermission($createPost);
 
 $owner->attachPermissions(array($createPost, $editUser));
 // equivalent to $owner->perms()->sync(array($createPost->id, $editUser->id));
-Checking for Roles & Permissions
+```
+
+#### Checking for Roles & Permissions
 
 Now we can check for roles and permissions simply by doing:
 
+```php
 $user->hasRole('owner');   // false
 $user->hasRole('admin');   // true
 $user->can('edit-user');   // false
 $user->can('create-post'); // true
-Both hasRole() and can() can receive an array of roles & permissions to check:
+```
 
+Both `hasRole()` and `can()` can receive an array of roles & permissions to check:
+
+```php
 $user->hasRole(['owner', 'admin']);       // true
 $user->can(['edit-user', 'create-post']); // true
-By default, if any of the roles or permissions are present for a user then the method will return true. Passing true as a second parameter instructs the method to require all of the items:
+```
 
+By default, if any of the roles or permissions are present for a user then the method will return true.
+Passing `true` as a second parameter instructs the method to require **all** of the items:
+
+```php
 $user->hasRole(['owner', 'admin']);             // true
 $user->hasRole(['owner', 'admin'], true);       // false, user does not have admin role
 $user->can(['edit-user', 'create-post']);       // true
 $user->can(['edit-user', 'create-post'], true); // false, user does not have edit-user permission
-You can have as many Roles as you want for each User and vice versa.
+```
 
-The Entrust class has shortcuts to both can() and hasRole() for the currently logged in user:
+You can have as many `Role`s as you want for each `User` and vice versa.
 
+The `Entrust` class has shortcuts to both `can()` and `hasRole()` for the currently logged in user:
+
+```php
 Entrust::hasRole('role-name');
 Entrust::can('permission-name');
 
@@ -188,38 +234,54 @@ Entrust::can('permission-name');
 
 Auth::user()->hasRole('role-name');
 Auth::user()->can('permission-name);
+```
+
 You can also use placeholders (wildcards) to check any matching permission by doing:
 
+```php
 // match any admin permission
 $user->can("admin.*"); // true
 
 // match any permission about users
 $user->can("*_users"); // true
-User ability
+```
 
-More advanced checking can be done using the awesome ability function. It takes in three parameters (roles, permissions, options):
 
-roles is a set of roles to check.
-permissions is a set of permissions to check.
+#### User ability
+
+More advanced checking can be done using the awesome `ability` function.
+It takes in three parameters (roles, permissions, options):
+- `roles` is a set of roles to check.
+- `permissions` is a set of permissions to check.
+
 Either of the roles or permissions variable can be a comma separated string or array:
 
+```php
 $user->ability(array('admin', 'owner'), array('create-post', 'edit-user'));
 
 // or
 
 $user->ability('admin,owner', 'create-post,edit-user');
-This will check whether the user has any of the provided roles and permissions. In this case it will return true since the user is an admin and has the create-post permission.
+```
+
+This will check whether the user has any of the provided roles and permissions.
+In this case it will return true since the user is an `admin` and has the `create-post` permission.
 
 The third parameter is an options array:
 
+```php
 $options = array(
     'validate_all' => true | false (Default: false),
     'return_type'  => boolean | array | both (Default: boolean)
 );
-validate_all is a boolean flag to set whether to check all the values for true, or to return true if at least one role or permission is matched.
-return_type specifies whether to return a boolean, array of checked values, or both in an array.
+```
+
+- `validate_all` is a boolean flag to set whether to check all the values for true, or to return true if at least one role or permission is matched.
+- `return_type` specifies whether to return a boolean, array of checked values, or both in an array.
+
 Here is an example output:
 
+```php
 $options = array(
     'validate_all' => true,
     'return_type' => 'both'
@@ -241,17 +303,23 @@ var_dump($allValidations);
 //     ['create-post'] => bool(true)
 //     ['edit-user'] => bool(false)
 // }
-The Entrust class has a shortcut to ability() for the currently logged in user:
 
+```
+The `Entrust` class has a shortcut to `ability()` for the currently logged in user:
+
+```php
 Entrust::ability('admin,owner', 'create-post,edit-user');
 
 // is identical to
 
 Auth::user()->ability('admin,owner', 'create-post,edit-user');
-Short syntax route filter
+```
 
-To filter a route by permission or role you can call the following in your app/Http/routes.php:
+### Short syntax route filter
 
+To filter a route by permission or role you can call the following in your `app/Http/routes.php`:
+
+```php
 // only users with roles that have the 'manage_posts' permission will be able to access any route within admin/post
 Entrust::routeNeedsPermission('admin/post*', 'create-post');
 
@@ -262,11 +330,22 @@ Entrust::routeNeedsRole('admin/advanced*', 'owner');
 // user would need to match all roles or permissions for that route
 Entrust::routeNeedsPermission('admin/post*', array('create-post', 'edit-comment'));
 Entrust::routeNeedsRole('admin/advanced*', array('owner','writer'));
-Both of these methods accept a third parameter. If the third parameter is null then the return of a prohibited access will be App::abort(403), otherwise the third parameter will be returned. So you can use it like:
+```
 
+Both of these methods accept a third parameter.
+If the third parameter is null then the return of a prohibited access will be `App::abort(403)`, otherwise the third parameter will be returned.
+So you can use it like:
+
+```php
 Entrust::routeNeedsRole('admin/advanced*', 'owner', Redirect::to('/home'));
-Furthermore both of these methods accept a fourth parameter. It defaults to true and checks all roles/permissions given. If you set it to false, the function will only fail if all roles/permissions fail for that user. Useful for admin applications where you want to allow access for multiple groups.
+```
 
+Furthermore both of these methods accept a fourth parameter.
+It defaults to true and checks all roles/permissions given.
+If you set it to false, the function will only fail if all roles/permissions fail for that user.
+Useful for admin applications where you want to allow access for multiple groups.
+
+```php
 // if a user has 'create-post', 'edit-comment', or both they will have access
 Entrust::routeNeedsPermission('admin/post*', array('create-post', 'edit-comment'), null, false);
 
@@ -282,10 +361,13 @@ Entrust::routeNeedsRoleOrPermission(
     null,
     false
 );
-Route filter
+```
 
-Entrust roles/permissions can be used in filters by simply using the can and hasRole methods from within the Facade:
+### Route filter
 
+Entrust roles/permissions can be used in filters by simply using the `can` and `hasRole` methods from within the Facade:
+
+```php
 Route::filter('manage_posts', function()
 {
     // check the current user
@@ -296,8 +378,11 @@ Route::filter('manage_posts', function()
 
 // only users with roles that have the 'manage_posts' permission will be able to access any admin/post route
 Route::when('admin/post*', 'manage_posts');
+```
+
 Using a filter to check for a role:
 
+```php
 Route::filter('owner_role', function()
 {
     // check the current user
@@ -308,29 +393,39 @@ Route::filter('owner_role', function()
 
 // only owners will have access to routes within admin/advanced
 Route::when('admin/advanced*', 'owner_role');
-As you can see Entrust::hasRole() and Entrust::can() checks if the user is logged in, and then if he or she has the role or permission. If the user is not logged the return will also be false.
+```
 
-Troubleshooting
+As you can see `Entrust::hasRole()` and `Entrust::can()` checks if the user is logged in, and then if he or she has the role or permission.
+If the user is not logged the return will also be `false`.
+
+## Troubleshooting
 
 If you encounter an error when doing the migration that looks like:
 
+```
 SQLSTATE[HY000]: General error: 1005 Can't create table 'laravelbootstrapstarter.#sql-42c_f8' (errno: 150)
     (SQL: alter table `role_user` add constraint role_user_user_id_foreign foreign key (`user_id`)
     references `users` (`id`)) (Bindings: array ())
-Then it's likely that the id column in your user table does not match the user_id column in role_user. Match sure both are INT(10).
+```
+
+Then it's likely that the `id` column in your user table does not match the `user_id` column in `role_user`.
+Match sure both are `INT(10)`.
 
 When trying to use the EntrustUserTrait methods, you encounter the error which looks like
 
-Class name must be a valid object or a string
-then probably you don't have published Entrust assets or something went wrong when you did it. First of all check that you have the entrust.php file in your app/config directory. If you don't, then try php artisan vendor:publish and, if it does not appear, manually copy the /vendor/zizaco/entrust/src/config/config.php file in your config directory and rename it entrust.php.
+    Class name must be a valid object or a string
 
-License
+then probably you don't have published Entrust assets or something went wrong when you did it. 
+First of all check that you have the `entrust.php` file in your `app/config` directory.
+If you don't, then try `php artisan vendor:publish` and, if it does not appear, manually copy the `/vendor/zizaco/entrust/src/config/config.php` file in your config directory and rename it `entrust.php`.
+
+## License
 
 Entrust is free software distributed under the terms of the MIT license.
 
-Contribution guidelines
+## Contribution guidelines
 
 Support follows PSR-1 and PSR-4 PHP coding standards, and semantic versioning.
 
-Please report any issue you find in the issues page.
+Please report any issue you find in the issues page.  
 Pull requests are welcome.
